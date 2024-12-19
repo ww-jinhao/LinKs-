@@ -1,0 +1,17 @@
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+  }
+
+body,
+input,
+button,
+a,
+select {
+  margin: 0;
+  font-family: 'Helvetica Neue', Arial, Helvetica, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', "微软雅黑", Arial, sans-serif;
+  font-size: 1.4rem;
+  line-height: 1.5;
+  color: #333;
+}
