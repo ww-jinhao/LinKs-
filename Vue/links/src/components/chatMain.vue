@@ -1,7 +1,11 @@
 <template>
   <div ref="chatContainer" class="chat-content">
-    <div v-for="item in data">
-      <div v-if="item.id == userData.userData.id" class="messagebox">
+    <slot></slot>
+    <div v-for="(item,index) in data" :key="index">
+      <div v-if="item.id == 0" class="user-context">
+        {{ item.username }} 加入了聊天室
+      </div>
+      <div v-else-if="item.id == userData.userData.id && item.id != 0" class="messagebox">
         <div style="display: flex;justify-content: right;width: 100%;margin-top: 10px;">
           <div class="self-message">
             <span>{{ item.message }}</span>
@@ -63,6 +67,11 @@ watch(data, () => {
 </script>
 
 <style scoped>
+.user-context{
+  width: 100%;
+  font-size: 0.8rem;
+  text-align: center;
+}
 .usernamebox {
   display: flex;
   justify-content: left;
@@ -94,6 +103,11 @@ watch(data, () => {
   width: 100%;
   height: 100%;
   overflow: auto;
+  -webkit-user-select: text; /* Chrome, Safari, Opera */
+  -moz-user-select: text;    /* Firefox */
+  -ms-user-select: text;     /* Internet Explorer/Edge */
+  user-select: text;
+  position: relative;
 }
 
 .messagebox {

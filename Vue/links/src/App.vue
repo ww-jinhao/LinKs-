@@ -1,4 +1,6 @@
 <script setup lang="ts">
+
+
 </script>
 
 <template>
@@ -6,6 +8,4 @@
     <router-view></router-view>
   </div>
 </template>
-<style scoped>
-
-</style>
+<style scoped></style>

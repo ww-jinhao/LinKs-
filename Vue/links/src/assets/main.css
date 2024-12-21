@@ -14,4 +14,8 @@ select {
   font-size: 1.4rem;
   line-height: 1.5;
   color: #333;
+  -webkit-user-select: none; /* Chrome, Safari, Opera */
+  -moz-user-select: none;    /* Firefox */
+  -ms-user-select: none;     /* Internet Explorer/Edge */
+  user-select: none;   
 }

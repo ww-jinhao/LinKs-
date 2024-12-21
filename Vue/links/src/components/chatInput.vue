@@ -11,25 +11,48 @@
 import { useUserDataStore } from '@/stores/userData';
 
 import { ref, onMounted, onUnmounted } from 'vue';
-import { io } from 'socket.io-client';
 import { useMessageStore } from '@/stores/messageStore';
+import { useOnlineUserStore } from '@/stores/onlineUser';
+import { useSocketStore } from '@/stores/socketStore';
+
+const socketStore = useSocketStore()
+
+const userData = useUserDataStore()
 const messageStore = useMessageStore()
+const onlineUserStore = useOnlineUserStore()
+
 
 const inputMessage = ref('');
-const socket = io('http://47.236.204.237:3000');
+
 
 onMounted(() => {
-  socket.on('receiveMessage', (data) => {
-    messageStore.message.push(data)
+  socketStore.socket.on('receiveMessage', (data) => {
+    messageStore.message.push(data);
   });
+
+  socketStore.socket.on('onlineUser', (data) => {
+    onlineUserStore.onlineUser = data;
+  });
+
+  if (userData.userData.id) {
+    socketStore.socket.emit('authenticate', {
+      userId: userData.userData.id,
+      account:userData.userData.account,
+      username: userData.userData.username,
+      avatar:userData.userData.avatar
+    });
+  }
 });
 
 onUnmounted(() => {
-  socket.disconnect();
+  const disconnectUserId = userData.userData.id;
+  if (disconnectUserId) {
+    socketStore.socket.emit("disconnertUser", disconnectUserId);
+  }
+  socketStore.socket.disconnect();
 });
 
 
-const userData = useUserDataStore()
 function submitMessage() {
   const now = new Date();
   const hours = String(now.getHours()).padStart(2, '0');
@@ -43,7 +66,7 @@ function submitMessage() {
     time: currentTime
   }
 
-  socket.emit('sendMessage', submitData);
+  socketStore.socket.emit('sendMessage', submitData);
 
   inputMessage.value = '';
 }

@@ -2,16 +2,39 @@
   <div class="content">
     <div class="main">
       <h2> Links 在线聊天室</h2>
-      <form class="form-box" @submit.prevent="handleSubmit">
+      <form class="form-box" @submit.prevent="handleSubmitLogin" v-show="isLogin">
         <div class="input-group">
           <label for="account">账号</label>
-          <input id="account" class="ipt" type="text" placeholder="请输入账号" required v-model="data.account" />
+          <input id="account" class="ipt" type="text" placeholder="请输入账号" required v-model="logindata.account" />
         </div>
         <div class="input-group">
           <label for="password">密码</label>
-          <input id="password" class="ipt" type="password" placeholder="请输入密码" required v-model="data.password" />
+          <input id="password" class="ipt" type="password" placeholder="请输入密码" required v-model="logindata.password" />
         </div>
-        <button type="submit" class="login-btn">登录</button>
+        <div style="display: flex;justify-content: space-evenly;">
+          <button @click="goRegister" type="button" class="login-btn">去注册</button>
+          <button type="submit" class="login-btn">登录</button>
+        </div>
+      </form>
+      <form class="form-box" @submit.prevent="handleSubmitRegister" v-show="!isLogin">
+        <div class="input-group">
+          <label for="account">账号</label>
+          <input id="account" class="ipt" type="text" placeholder="请输入账号" readonly v-model="registerdata.account" />
+        </div>
+        <div class="input-group">
+          <label for="username">用户名</label>
+          <input id="username" class="ipt" type="text" placeholder="请输入用户名" required v-model="registerdata.username" />
+        </div>
+        <div class="input-group">
+          <label for="password">密码</label>
+          <input id="password" class="ipt" type="password" placeholder="请输入密码" required
+            v-model="registerdata.password" />
+        </div>
+        <div style="display: flex;justify-content: space-evenly;">
+          <button @click="goLogin" type="button" class="login-btn">去登录</button>
+          <button type="submit" class="login-btn">注册</button>
+        </div>
+
       </form>
     </div>
   </div>
@@ -20,19 +43,78 @@
 <script lang="ts" setup>
 import router from '@/router';
 import { useUserDataStore } from '@/stores/userData';
-import { login } from '@/views/login/login';
-import { reactive } from 'vue';
+import { login, getNextAccount, register } from '@/views/login/login';
+import { ElMessage } from 'element-plus';
+import { ref, reactive, onBeforeMount, onMounted } from 'vue';
+
 const userData = useUserDataStore()
 
-const data = reactive({
+let isLogin = ref(true)
+
+onBeforeMount(async () => {
+  try {
+    let res = await getNextAccount()
+    registerdata.account = res.data.account
+  }
+  catch (error: any) {
+    if (error.response) {
+      ElMessage.error("获取注册账号失败，请重试")
+    }
+  }
+
+})
+
+const logindata = reactive({
   account: '',
   password: ''
 })
 
-async function handleSubmit() {
+interface Irdata {
+  account: number | null,
+  password: string,
+  avatar: string,
+  username: string,
+}
+const registerdata = reactive<Irdata>({
+  account: null,
+  password: '',
+  avatar: "https://bu.dusays.com/2024/12/19/6763f65a7d064.jpg",
+  username: ''
+})
+
+function goLogin() {
+  isLogin.value = true
+}
+
+function goRegister() {
+  isLogin.value = false
+}
+
+
+async function handleSubmitRegister() {
   const formdata = {
-    account: data.account,
-    password: data.password
+    account: registerdata.account,
+    password: registerdata.password,
+    avatar: registerdata.avatar,
+    username: registerdata.username
+  }
+  try {
+    await register(formdata)
+    registerdata.account = null
+    registerdata.password = ''
+    registerdata.username = ''
+  }
+  catch (error: any) {
+    if (error.response) {
+      ElMessage.error("注册账号失败，请重试")
+    }
+  }
+}
+
+async function handleSubmitLogin() {
+  const formdata = {
+    account: logindata.account,
+    password: logindata.password
   }
   try {
     const res = await login(formdata)
@@ -43,15 +125,13 @@ async function handleSubmit() {
     userData.userData.username = res.data.data.username
     userData.userData.avatar = res.data.data.avatar
 
-    console.log(userData.userData);
-
-    if(token){
+    if (token) {
       localStorage.setItem('token', token)
     }
     router.push('/chat')
-  } catch (error:any) {
-    if(error.response){
-      console.log(error.response.data.message);
+  } catch (error: any) {
+    if (error.response) {
+      ElMessage.error(error.response.data.message)
     }
 
   }
@@ -123,7 +203,7 @@ async function handleSubmit() {
 }
 
 .login-btn {
-  width: 65%;
+  width: 40%;
   padding: 12px;
   background-color: rgb(82, 127, 234);
   border: none;

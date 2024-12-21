@@ -1,7 +1,10 @@
 import axios, { type AxiosInstance,type AxiosError,type AxiosResponse,type InternalAxiosRequestConfig } from 'axios';
+import { useRouter } from 'vue-router';
+const router = useRouter()
 //创建axios实例
 const instance:AxiosInstance = axios.create({
-  baseURL:"http://47.236.204.237:3000",
+  // baseURL:"http://47.236.204.237:3000",
+  baseURL:"http://localhost:3000",
   timeout:3000,
   headers:{
     "Content-Type":"application/json",
@@ -12,6 +15,12 @@ const instance:AxiosInstance = axios.create({
 instance.interceptors.request.use((config:InternalAxiosRequestConfig) => {
   const token = localStorage.getItem('token');
   if (token) {
+    const decodedToken = JSON.parse(atob(token.split('.')[1]));
+    const currentTime = new Date().getTime() / 1000;
+    if (decodedToken.exp < currentTime) {
+      router.push("/login")
+      return Promise.reject('Token expired');
+    }
     config.headers['Authorization'] = token;
   }
   return config;
