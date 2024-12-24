@@ -1,7 +1,7 @@
 <template>
   <div ref="chatContainer" class="chat-content">
     <slot></slot>
-    <div v-for="(item,index) in data" :key="index">
+    <div v-for="(item,index) in messageStore.message" :key="index">
       <div v-if="item.id == 0" class="user-context">
         {{ item.username }} 加入了聊天室
       </div>
@@ -48,14 +48,12 @@ import { useUserDataStore } from '@/stores/userData';
 
 const userData = useUserDataStore();
 const messageStore = useMessageStore();
-const data = messageStore.message;
 
 const chatContainer = ref<HTMLDivElement | null>();
 
-watch(data, () => {
+watch(messageStore.message, () => {
   nextTick(() => {
-    console.log(chatContainer.value?.scrollTop, chatContainer.value?.scrollHeight);
-
+    console.log(messageStore.message);
     if (chatContainer.value) {
       if (chatContainer.value.scrollHeight > 450) {
         chatContainer.value.scrollTop = chatContainer.value.scrollHeight - 450

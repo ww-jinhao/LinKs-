@@ -8,7 +8,10 @@ interface IOnlineUserData {
 
 export const useOnlineUserStore = defineStore('OnlineUserStore', () => {
   const onlineUser:(IOnlineUserData[]) = []
-  return { onlineUser }
+  function clearOnlineUserStore(){
+    onlineUser.length = 0
+  }
+  return { onlineUser,clearOnlineUserStore }
 },
 {
   persist:true,

@@ -27,7 +27,7 @@ const inputMessage = ref('');
 
 onMounted(() => {
   socketStore.socket.on('receiveMessage', (data) => {
-    messageStore.message.push(data);
+    messageStore.message.push(data)
   });
 
   socketStore.socket.on('onlineUser', (data) => {

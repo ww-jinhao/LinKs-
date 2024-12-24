@@ -2,13 +2,13 @@
   <div class="content">
     <div class="leftbox">
       <div class="userbox">
-        <div class="avatarbox">
+        <div class="avatarbox" @click="dialogFormVisible = true">
           <img :src="userData.userData.avatar" alt="">
         </div>
         <span style="font-size: 16px;">{{ userData.userData.username }}</span>
       </div>
       <div class="out" @click="getOut">
-
+        退出
       </div>
     </div>
     <div class="rightbox">
@@ -38,29 +38,40 @@
       </div>
     </div>
   </div>
-
+  <el-dialog v-model="dialogFormVisible" title="用户信息更改" width="500">
+    <ChangeUserData/>
+  </el-dialog>
 </template>
 <script lang="ts" setup>
+import ChangeUserData from '@/components/changeUserData.vue';
 import ChatInput from '@/components/chatInput.vue';
 import ChatMain from '@/components/chatMain.vue';
+import { useMessageStore } from '@/stores/messageStore';
 import { useOnlineUserStore } from '@/stores/onlineUser';
-import { useSocketStore } from '@/stores/socketStore';
 import { useUserDataStore } from '@/stores/userData';
 import {  ref } from 'vue';
-const socketStore = useSocketStore()
+import { useRouter } from 'vue-router';
 
+const router = useRouter()
+
+const messageStore = useMessageStore()
 const onlineUserStore = useOnlineUserStore()
 const userData = useUserDataStore()
 
 let isShowOnlineList = ref(false)
-
+const dialogFormVisible = ref(false)
 function showOnlineList(){
   isShowOnlineList.value = !isShowOnlineList.value
 }
 
 function getOut(){
-  socketStore.socket.disconnect()
+  localStorage.removeItem('token')
+  router.push("/login")
+  onlineUserStore.clearOnlineUserStore()
+  userData.clearOnlineUserStore()
+  messageStore.clearMessageStore()
 }
+
 </script>
 
 <style scoped>

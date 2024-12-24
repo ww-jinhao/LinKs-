@@ -1,11 +1,18 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { useMessageStore } from '@/stores/messageStore';
+import { useOnlineUserStore } from '@/stores/onlineUser';
+import { useUserDataStore } from '@/stores/userData';
+import { setActivePinia, createPinia } from 'pinia';
+
+
+
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
-      path:'/',
-      redirect:'/login'
+      path: '/',
+      redirect: '/login'
     },
     {
       path: '/login',
@@ -33,6 +40,10 @@ router.beforeEach((to, from, next) => {
           next();
         }
         return;
+      } else {
+
+        localStorage.removeItem('token');
+
       }
     } catch (error) {
       console.error('Error decoding token:', error);

@@ -133,6 +133,9 @@ async function handleSubmitLogin() {
     if (error.response) {
       ElMessage.error(error.response.data.message)
     }
+    else{
+      ElMessage.error("请求失败")
+    }
 
   }
 

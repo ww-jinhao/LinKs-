@@ -85,7 +85,6 @@ app.post('/login', (req, res) => {
         if (err) {
             return console.error(err.message)
         }
-
         if (row) {
             const userData = {
                 id: row.id,
